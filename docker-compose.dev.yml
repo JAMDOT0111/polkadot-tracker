@@ -2,18 +2,28 @@ version: "3.9"
 
 services:
   frontend:
-    command: npm run dev -- --host 0.0.0.0
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: builder
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://localhost:3001
+      - VITE_API_URL=http://backend:3001
 
   backend:
-    command: npm run dev
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: builder
+    command: sh -c "npm ci && npm run dev"
     ports:
       - "3001:3001"
     environment:
       - NODE_ENV=development
+      # 與 docker-compose.yml 對齊：Compose 會從專案根目錄 .env 讀取變數做代入
+      - SUBSCAN_API_KEY=${SUBSCAN_API_KEY:-}
 
   nginx:
     profiles:

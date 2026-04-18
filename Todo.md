@@ -5,3 +5,40 @@
 註記：本機 PowerShell 找不到 `npm`，改用 Docker 驗證時又卡在既有的 build context 問題（`node_modules/.bin/baseline-browser-mapping`），需先處理 docker build context 設定後再完成此步。
 
 - [x] 4. 新增 `frontend/.dockerignore` 排除 `node_modules` 避免 build context 錯誤
+- [x] 5. 修正 `docker-compose.dev.yml` frontend 服務使用 Node builder stage 跑 dev server
+- [x] 6. 重啟 compose 並驗證 frontend (`5173`) 正常啟動
+- [x] 7. 新增 `backend/.dockerignore` 排除 `node_modules` 避免 backend build context 錯誤
+- [x] 8. 修正 `docker-compose.dev.yml` backend 服務使用 Node builder stage 跑 dev server
+- [x] 9. 重啟 compose 並驗證 backend (`3001`) 正常啟動
+- [x] 10. 調整 `backend/Dockerfile` 支援 `target: builder`
+- [x] 11. 改善前端 API 錯誤顯示，優先呈現後端實際錯誤訊息
+- [x] 12. 修正 compose 中 `VITE_API_URL`，讓 Vite proxy 在容器內指向 `backend:3001`
+- [x] 13. 修正 `frontend/src/App.jsx` 正確解析帳號物件，避免數值皆顯示為 0
+- [x] 14. 修正轉帳金額解析：優先使用 Subscan `amount_v2`（完整 planck），避免顯示 -0.0000
+- [x] 15. 修正資產轉帳顯示：優先用歷史法幣換算／小數 `amount`，避免用 Relay decimals 去除 assets
+- [x] 16. 切換 Polkadot/Kusama 時若已有地址則自動重新查詢，避免混用上一網路資料
+- [x] 17. 後端合併 Relay + Asset Hub（Subscan）本幣餘額與轉帳列表；前端摘要改用 `balance_total`／`lock_total`
+- [x] 18. 後端 `lock_total` 合併 lock 與 reserved（並補 `reserved_total`／`lock_only_total` 欄位供對照）
+- [x] 19. 前端摘要第三欄改用 Subscan transfers API 的 `count`（`useTracker` 新增 `transfersCount`）
+- [x] 20. UI 文案同步：摘要與質押分頁顯示「鎖定+保留」，並更新備註說明轉帳筆數口徑
+- [x] 21. `docker-compose.dev.yml` 的 backend 補上 `SUBSCAN_API_KEY`（與 prod compose 對齊）；Subscan HTTP 錯誤時回傳 body 摘要
+- [x] 22. 後端 account 合併 Relay `bonded`／`unbonding`：補打 Subscan `/api/scan/staking/nominator` 與 `/api/scan/staking/unbonding`；質押分頁加註「非質押鎖定」說明
+- [x] 23. 合併提名池 `bonded`、覆寫 `account.bonded`；關聯地址改本幣淨額＋`account-tags` 與 XCM 比例標籤（交易所／跨鏈／一般）
+- [x] 24. 轉帳列表：對手地址列顯示 Subscan `merkle` 標籤（`para:{id} (名稱)`、交易所等）
+- [x] 25. 轉帳標籤對齊 Subscan：`display`／`people.display` 的 `para:…`、`Pool#…(Stash)`；merkle 補平行鏈 id；標籤配色分 para／Pool／交易所
+- [x] 26. 轉帳列點擊開 Subscan extrinsic（後端附 `subscan_explorer_origin`）；關注地址 localStorage；地址可複製（轉帳／關聯／關注列表）
+- [x] 27. 轉帳相對時間：≥24 小時改為「N天M小時前」
+- [x] 28. 摘要區顯示「幕前查詢地址」分類標籤（交易所／跨鏈／一般＋提名人／驗證者／提名池）
+- [x] 29. 摘要區新增「Portfolio Statistics」：Relay／Asset Hub 依 Subscan account/tokens 各分類持有筆數
+- [x] 30. Portfolio Statistics 各分類顯示幣別符號列表（優先 symbol，備用 unique_id；項數多時可捲動）
+- [x] 31. Portfolio 分佈圖（依 Value 前 10 + Others）＋ Wallet Token 僅列 Value 前 10 大；NFT 分頁占位
+- [x] 32. 後端批次請求主要平行鏈 account/tokens 合併為 tokens_parachains；前 10 大含平行鏈持倉
+- [x] 33. 平行鏈／Portfolio 網路清單改與 Subscan 官方 API 文件 live 端點表一致（獨立 config 檔）
+- [x] 34. Portfolio 區塊：目前查詢地址可複製，並連結至 Subscan Portfolio 帳戶頁
+- [x] 35. 串接 Subscan Value API（多路徑 fallback）顯示 Total/Wallet/DeFi/Transferable；Token 餘額改千分位
+- [x] 36. 新增 Value/Price 診斷資訊（命中路徑與失敗原因）；Token 追加 Price 欄並以 token_usd_prices 回填 Value
+- [x] 37. 新增 `portfolio.subscan.io` `__NEXT_DATA__` fallback：回填 token_usd_prices 並計算 Wallet/Total Value
+- [x] 38. Price 配對優先改用 `token_unique_id`（含 network+unique_id 索引）再回退 symbol，提升 i1DOT/DED 類命中率
+- [ ] 39. 新增同義 symbol 映射（如 i1DOT/GDOT/LKSM 等），取價時原符號失敗再回退 alias（已取消）
+- [x] 40. Wallet/Price/Value 改以 `portfolio.subscan.io::__NEXT_DATA__.account.assets` 為主來源（對齊 Subscan Portfolio）
+- [x] 41. `__NEXT_DATA__` 命中時簡化 debug 文案：隱藏 404 與 Price 解析統計，僅顯示資料來源

@@ -8,7 +8,7 @@ services:
     container_name: polkadot-frontend
     restart: unless-stopped
     environment:
-      - VITE_API_URL=http://localhost:3001
+      - VITE_API_URL=http://backend:3001
     volumes:
       - ./frontend:/app
       - /app/node_modules

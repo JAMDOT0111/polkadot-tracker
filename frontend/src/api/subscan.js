@@ -6,8 +6,12 @@ async function request(path, body) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
+  const payload = await res.json().catch(() => null)
+  if (!res.ok) {
+    const msg = payload?.error || payload?.message || `HTTP ${res.status}`
+    throw new Error(msg)
+  }
+  return payload || {}
 }
 
 export const api = {
@@ -25,4 +29,7 @@ export const api = {
 
   getRelatedAddresses: (network, address) =>
     request(`/${network}/related`, { address }),
+
+  getAccountTags: (network, addresses) =>
+    request(`/${network}/account-tags`, { addresses }),
 }
